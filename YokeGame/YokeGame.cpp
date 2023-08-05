@@ -63,11 +63,6 @@ void printString(float x, float y, const char* str, int length) {
 		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, str[i]);
 	}
 }
-
-void enemy_move(float enemy_posX, float enemy_posY, bool enemy_up, bool enemy_goLeft, float enemy_speed) {
-	
-}
-
 //工夫したところ
 float enemy_move_up(float enemy_posY, bool enemy_up, float enemy_speed) {
 	if (enemy_up) enemy_posY -= enemy_speed;
@@ -93,6 +88,13 @@ bool enemy_up_or_down(float enemy_posY, bool _enemy_up) {
 	if (enemy_posY >= ENEMY_GENERATE_MAXY && !_enemy_up) return true;
 	else if (enemy_posY <= ENEMY_GENERATE_MINY && _enemy_up) return false;
 	else return _enemy_up;
+}
+
+void enemy_move(float enemy_posX, float enemy_posY, bool enemy_up, bool enemy_goLeft, float enemy_speed) {
+	enemy_up = enemy_up_or_down(enemy_posY, enemy_up);
+	enemy_goLeft = enemy_move_left_or_right(enemy_posX, enemy_goLeft);
+	enemy_posX = enemy_move_side(enemy_posX, enemy_goLeft, enemy_speed);
+	enemy_posY = enemy_move_up(enemy_posY, enemy_up, enemy_speed);
 }
 
 //工夫したところ
@@ -196,18 +198,21 @@ void display() {
 	enemy1_goLeft = enemy_move_left_or_right(enemy1_posX,enemy1_goLeft);
 	enemy1_posX = enemy_move_side(enemy1_posX, enemy1_goLeft, enemy1_speed);
 	enemy1_posY = enemy_move_up(enemy1_posY, enemy1_up, enemy1_speed);
+	//enemy_move(enemy1_posX, enemy1_posY, enemy1_up, enemy1_goLeft, enemy1_speed);
 
 	//敵2の移動処理
 	enemy2_up = enemy_up_or_down(enemy2_posY, enemy2_up);
 	enemy2_goLeft = enemy_move_left_or_right(enemy2_posX, enemy2_goLeft);
 	enemy2_posX = enemy_move_side(enemy2_posX, enemy2_goLeft, enemy2_speed);
 	enemy2_posY = enemy_move_up(enemy2_posY, enemy2_up, enemy2_speed);
+	//enemy_move(enemy2_posX, enemy2_posY, enemy2_up, enemy2_goLeft, enemy2_speed);
 
 	//敵3の移動処理
 	enemy3_up = enemy_up_or_down(enemy3_posY, enemy3_up);
 	enemy3_goLeft = enemy_move_left_or_right(enemy3_posX, enemy3_goLeft);
 	enemy3_posX = enemy_move_side(enemy3_posX, enemy3_goLeft, enemy3_speed);
 	enemy3_posY = enemy_move_up(enemy3_posY, enemy3_up, enemy3_speed);
+	//enemy_move(enemy3_posX, enemy3_posY, enemy3_up, enemy3_goLeft, enemy3_speed);
 
 	//敵1の描画
 	draw_enemy(enemy1_posX,enemy1_posY);
@@ -215,7 +220,6 @@ void display() {
 	draw_enemy(enemy2_posX, enemy2_posY);
 	//敵3の描画
 	draw_enemy(enemy3_posX, enemy3_posY);
-
 
 	//ゴール描画
 	glColor4f(1.0f, 0.5f, 0.0f, 1.0f);	//オレンジ
@@ -249,14 +253,14 @@ void display() {
 	//Goalとの衝突判定。つまりゲームクリア
 	if (abs(player_posX - GOAL_POSX) < GOAL_SIZEX && abs(player_posY - GOAL_POSY) < GOAL_SIZEY) gameclear_flag = true;
 
-	//ゲームオーバー時の処理
+	//ゲームクリア時の処理
 	if (gameclear_flag) {
 		glColor4f(1.0f, 0.6f, 0.0f, 1.0f);	//オレンジ
 		printString(250, 450, "GAME CLEAR!", 11);
 		printString(250, 480, "CONGRATULATION!!", 16);
 		printString(250, 510, "YOU CAN QUIT GAME BY PUSHING Q", 30);
 	}
-	//ゲームクリア時の処理
+	//ゲームオーバー時の処理
 	if (gameover_flag) {
 		glColor4f(0.0f, 0.0f, 0.0f, 1.0f);	//黒
 		printString(250, 450, "GAME OVER", 9);
