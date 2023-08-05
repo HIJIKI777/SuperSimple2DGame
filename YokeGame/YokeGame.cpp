@@ -54,28 +54,6 @@ float enemy3_speed = 0.08;
 bool enemy3_up = true;
 bool enemy3_goLeft = false;
 
-class player {
-private:
-
-public:
-	float player_posX;
-	float player_posY;
-
-	void player_draw() {
-		glColor4f(0.0f, 0.5f, 0.0f, 1.0f);
-		glBegin(GL_QUADS);
-		glVertex2i(0, 0);
-		glVertex2i(100, 0);
-		glVertex2i(100, 100);
-		glVertex2i(0, 100);
-		glEnd();
-
-	}
-
-	void player_move_up(int up_degree) {
-
-	}
-};
 
 void printString(float x, float y, const char* str, int length) {
 	float z = -1.0f;
@@ -86,24 +64,12 @@ void printString(float x, float y, const char* str, int length) {
 	}
 }
 
-
 void enemy_move(float enemy_posX, float enemy_posY, bool enemy_up, bool enemy_goLeft, float enemy_speed) {
-	if (enemy_posY >= ENEMY_GENERATE_MAXY && !enemy_up) enemy_up = true;
-	else if (enemy_posY <= ENEMY_GENERATE_MINY && enemy_up) enemy_up = false;
-	if (enemy_posX >= ENEMY_GENERATE_MAXX && !enemy_goLeft) enemy_goLeft = true;
-	else if (enemy_posX <= ENEMY_GENERATE_MINX && enemy_goLeft) enemy_goLeft = false;
-
-	if (enemy_up) enemy_posY -= enemy_speed;
-	else if (!enemy_up) enemy_posY += enemy_speed;
-
-	if (enemy_goLeft) enemy_posX -= enemy_speed;
-	else if (!enemy_goLeft) enemy_posX += enemy_speed;
+	
 }
 
+//工夫したところ
 float enemy_move_up(float enemy_posY, bool enemy_up, float enemy_speed) {
-	//if (enemy_posY >= ENEMY_GENERATE_MAXY && !enemy_up) enemy_up = true;
-	//else if (enemy_posY <= ENEMY_GENERATE_MINY && enemy_up) enemy_up = false;
-
 	if (enemy_up) enemy_posY -= enemy_speed;
 	else if (!enemy_up) enemy_posY += enemy_speed;
 
@@ -111,9 +77,6 @@ float enemy_move_up(float enemy_posY, bool enemy_up, float enemy_speed) {
 }
 
 float enemy_move_side(float enemy_posX, bool enemy_goLeft, float enemy_speed) {
-	//if (enemy_posX >= ENEMY_GENERATE_MAXX && !enemy_goLeft) enemy_goLeft = true;
-	//else if (enemy_posX <= ENEMY_GENERATE_MINX && enemy_goLeft) enemy_goLeft = false;
-
 	if (enemy_goLeft) enemy_posX -= enemy_speed;
 	else if (!enemy_goLeft) enemy_posX += enemy_speed;
 
@@ -132,16 +95,18 @@ bool enemy_up_or_down(float enemy_posY, bool _enemy_up) {
 	else return _enemy_up;
 }
 
-//float calculate_distance_player_to_enemy() {
-//
-//}
+//工夫したところ
+float distance_playerX_to_enemyX(float _player_posX, float _enemy_posX) {
+	return abs((_player_posX + PLAYER_SIZE / 2) - _enemy_posX) ;
+}
 
-void collision_enemy() {
-
+//工夫したところ
+float distance_playerY_to_enemyY(float _player_posY, float _enemy_posY) {
+	return abs((_player_posY + PLAYER_SIZE / 2) - (_enemy_posY + ENEMY_SIZE / 2));
 }
 
 void key_press(unsigned char key, int x, int y) {
-	if (!gameover_flag && !gameclear_flag) {
+	if (!gameover_flag && !gameclear_flag) {	//工夫したところ
 		switch (key) {
 		case 'w':
 			//上移動
@@ -189,20 +154,15 @@ void draw_enemy(float enemy_posX, float enemy_posY) {
 
 void initialize() {
 
-	//player_posX = PLAYER_START_POSX;
-	//player_posY = PLAYER_START_POSY;
-
+	//乱数の種生成
 	srand(time(NULL));
 
 	//第1の敵の初期座標生成
 	enemy1_posX = ENEMY_GENERATE_MINX + rand() % (ENEMY_GENERATE_MAXX - ENEMY_GENERATE_MINX + 1);
 	enemy1_posY = ENEMY_GENERATE_MINY + rand() % (ENEMY_GENERATE_MAXY - ENEMY_GENERATE_MINY + 1);
-
 	//第2の敵の初期座標生成
 	enemy2_posX = ENEMY_GENERATE_MINX + rand() % (ENEMY_GENERATE_MAXX - ENEMY_GENERATE_MINX + 1);
 	enemy2_posY = ENEMY_GENERATE_MINY + rand() % (ENEMY_GENERATE_MAXY - ENEMY_GENERATE_MINY + 1);
-
-
 	//第3の敵の初期座標生成
 	enemy3_posX = ENEMY_GENERATE_MINX + rand() % (ENEMY_GENERATE_MAXX - ENEMY_GENERATE_MINX + 1);
 	enemy3_posY = ENEMY_GENERATE_MINY + rand() % (ENEMY_GENERATE_MAXY - ENEMY_GENERATE_MINY + 1);
@@ -221,7 +181,6 @@ void reshape(int x, int y) {
 //ゲームに映る画面の詳細
 void display() {
 	// 画面全体を指定した色で塗りつぶす 
-	//glClear(GL_COLOR_BUFFER_BIT);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//テキストUI表示
@@ -233,54 +192,18 @@ void display() {
 	player_posY = PLAYER_START_POSY + player_moveY_degree;
 
 	//敵1の移動処理
-	//if (enemy1_posY >= ENEMY_GENERATE_MAXY && !enemy1_up) enemy1_up = true;
-	//else if(enemy1_posY <= ENEMY_GENERATE_MINY && enemy1_up) enemy1_up = false;
-	//if (enemy1_posX >= ENEMY_GENERATE_MAXX && !enemy1_goLeft) enemy1_goLeft = true;
-	//else if (enemy1_posX <= ENEMY_GENERATE_MINX && enemy1_goLeft) enemy1_goLeft = false;
-
-	//if (enemy1_up) enemy1_posY -= enemy1_speed;
-	//else if (!enemy1_up) enemy1_posY += enemy1_speed;
-
-	//if (enemy1_goLeft) enemy1_posX -= enemy1_speed;
-	//else if (!enemy1_goLeft) enemy1_posX += enemy1_speed;
-
-	//enemy_move(enemy1_posX, enemy1_posY, enemy1_up, enemy1_goLeft, enemy1_speed);
 	enemy1_up = enemy_up_or_down(enemy1_posY, enemy1_up);
 	enemy1_goLeft = enemy_move_left_or_right(enemy1_posX,enemy1_goLeft);
 	enemy1_posX = enemy_move_side(enemy1_posX, enemy1_goLeft, enemy1_speed);
 	enemy1_posY = enemy_move_up(enemy1_posY, enemy1_up, enemy1_speed);
 
 	//敵2の移動処理
-	//if (enemy2_posY >= ENEMY_GENERATE_MAXY && !enemy2_up) enemy2_up = true;
-	//else if (enemy2_posY <= ENEMY_GENERATE_MINY && enemy2_up) enemy2_up = false;
-	//if (enemy2_posX >= ENEMY_GENERATE_MAXX && !enemy2_goLeft) enemy2_goLeft = true;
-	//else if (enemy2_posX <= ENEMY_GENERATE_MINX && enemy2_goLeft) enemy2_goLeft = false;
-
-	//if (enemy2_up) enemy2_posY -= enemy2_speed;
-	//else if (!enemy2_up) enemy2_posY += enemy2_speed;
-
-	//if (enemy2_goLeft) enemy2_posX -= enemy2_speed;
-	//else if (!enemy2_goLeft) enemy2_posX += enemy2_speed;
-
-	//enemy_move(enemy2_posX, enemy2_posY, enemy2_up, enemy2_goLeft, enemy2_speed);
 	enemy2_up = enemy_up_or_down(enemy2_posY, enemy2_up);
 	enemy2_goLeft = enemy_move_left_or_right(enemy2_posX, enemy2_goLeft);
 	enemy2_posX = enemy_move_side(enemy2_posX, enemy2_goLeft, enemy2_speed);
 	enemy2_posY = enemy_move_up(enemy2_posY, enemy2_up, enemy2_speed);
 
 	//敵3の移動処理
-	//if (enemy3_posY >= ENEMY_GENERATE_MAXY && !enemy3_up) enemy3_up = true;
-	//else if (enemy3_posY <= ENEMY_GENERATE_MINY && enemy3_up) enemy3_up = false;
-	//if (enemy3_posX >= ENEMY_GENERATE_MAXX && !enemy3_goLeft) enemy3_goLeft = true;
-	//else if (enemy3_posX <= ENEMY_GENERATE_MINX && enemy3_goLeft) enemy3_goLeft = false;
-
-	//if (enemy3_up) enemy3_posY -= enemy3_speed;
-	//else if (!enemy3_up) enemy3_posY += enemy3_speed;
-
-	//if (enemy3_goLeft) enemy3_posX -= enemy3_speed;
-	//else if (!enemy3_goLeft) enemy3_posX += enemy3_speed;
-
-	//enemy_move(enemy3_posX, enemy3_posY, enemy3_up, enemy3_goLeft, enemy3_speed);
 	enemy3_up = enemy_up_or_down(enemy3_posY, enemy3_up);
 	enemy3_goLeft = enemy_move_left_or_right(enemy3_posX, enemy3_goLeft);
 	enemy3_posX = enemy_move_side(enemy3_posX, enemy3_goLeft, enemy3_speed);
@@ -317,29 +240,14 @@ void display() {
 
 	//enemy1との衝突判定
 	//工夫したところ
-	if (abs((player_posX + PLAYER_SIZE / 2) - enemy1_posX) < HITBOX_SIZE && abs((player_posY + PLAYER_SIZE / 2) - (enemy1_posY + ENEMY_SIZE / 2)) < HITBOX_SIZE) {
-		gameover_flag = true;
-		//exit(0);
-	}
-
+	if (distance_playerX_to_enemyX(player_posX, enemy1_posX) < HITBOX_SIZE && distance_playerY_to_enemyY(player_posY, enemy1_posY) < HITBOX_SIZE) gameover_flag = true;
 	//enemy2との衝突判定
-	//工夫したところ
-	if (abs((player_posX + PLAYER_SIZE / 2) - enemy2_posX) < HITBOX_SIZE && abs((player_posY + PLAYER_SIZE / 2) - (enemy2_posY + ENEMY_SIZE / 2)) < HITBOX_SIZE) {
-		gameover_flag = true;
-		//exit(0);
-	}
-
+	if (distance_playerX_to_enemyX(player_posX, enemy2_posX) < HITBOX_SIZE && distance_playerY_to_enemyY(player_posY, enemy2_posY) < HITBOX_SIZE) gameover_flag = true;
 	//enemy3との衝突判定
-	if (abs((player_posX + PLAYER_SIZE / 2) - enemy3_posX) < HITBOX_SIZE && abs((player_posY + PLAYER_SIZE / 2) - (enemy3_posY + ENEMY_SIZE / 2)) < HITBOX_SIZE) {
-		gameover_flag = true;
-		//exit(0);
-	}
+	if (distance_playerX_to_enemyX(player_posX, enemy3_posX) < HITBOX_SIZE && distance_playerY_to_enemyY(player_posY, enemy3_posY) < HITBOX_SIZE) gameover_flag = true;
 
 	//Goalとの衝突判定。つまりゲームクリア
-	if (abs(player_posX - GOAL_POSX) < GOAL_SIZEX && abs(player_posY - GOAL_POSY) < GOAL_SIZEY) {
-		gameclear_flag = true;
-		//exit(0);
-	}
+	if (abs(player_posX - GOAL_POSX) < GOAL_SIZEX && abs(player_posY - GOAL_POSY) < GOAL_SIZEY) gameclear_flag = true;
 
 	//ゲームオーバー時の処理
 	if (gameclear_flag) {
