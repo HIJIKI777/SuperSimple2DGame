@@ -26,12 +26,6 @@
 
 using namespace std;
 
-//必要なヘッダ
-//player.h cloud.h mountain.h enemy_bird.h
-
-//必要な要素
-//キー操作、スコア、ライフ、ゲームオーバー、衝突判定、生成スクリプト
-
 int life = 3;		//プレイヤー残機
 int score = 0;		//スコア。飛距離
 bool gameover_flag = false;		//trueでゲームオーバー
@@ -93,6 +87,59 @@ void printString(float x, float y, const char* str, int length) {
 }
 
 
+void enemy_move(float enemy_posX, float enemy_posY, bool enemy_up, bool enemy_goLeft, float enemy_speed) {
+	if (enemy_posY >= ENEMY_GENERATE_MAXY && !enemy_up) enemy_up = true;
+	else if (enemy_posY <= ENEMY_GENERATE_MINY && enemy_up) enemy_up = false;
+	if (enemy_posX >= ENEMY_GENERATE_MAXX && !enemy_goLeft) enemy_goLeft = true;
+	else if (enemy_posX <= ENEMY_GENERATE_MINX && enemy_goLeft) enemy_goLeft = false;
+
+	if (enemy_up) enemy_posY -= enemy_speed;
+	else if (!enemy_up) enemy_posY += enemy_speed;
+
+	if (enemy_goLeft) enemy_posX -= enemy_speed;
+	else if (!enemy_goLeft) enemy_posX += enemy_speed;
+}
+
+float enemy_move_up(float enemy_posY, bool enemy_up, float enemy_speed) {
+	//if (enemy_posY >= ENEMY_GENERATE_MAXY && !enemy_up) enemy_up = true;
+	//else if (enemy_posY <= ENEMY_GENERATE_MINY && enemy_up) enemy_up = false;
+
+	if (enemy_up) enemy_posY -= enemy_speed;
+	else if (!enemy_up) enemy_posY += enemy_speed;
+
+	return enemy_posY;
+}
+
+float enemy_move_side(float enemy_posX, bool enemy_goLeft, float enemy_speed) {
+	//if (enemy_posX >= ENEMY_GENERATE_MAXX && !enemy_goLeft) enemy_goLeft = true;
+	//else if (enemy_posX <= ENEMY_GENERATE_MINX && enemy_goLeft) enemy_goLeft = false;
+
+	if (enemy_goLeft) enemy_posX -= enemy_speed;
+	else if (!enemy_goLeft) enemy_posX += enemy_speed;
+
+	return enemy_posX;
+}
+
+bool enemy_move_left_or_right(float enemy_posX, bool _enemy_goLeft) {
+	if (enemy_posX >= ENEMY_GENERATE_MAXX && !_enemy_goLeft) return true;
+	else if (enemy_posX <= ENEMY_GENERATE_MINX && _enemy_goLeft) return false;
+	else return _enemy_goLeft;
+}
+
+bool enemy_up_or_down(float enemy_posY, bool _enemy_up) {
+	if (enemy_posY >= ENEMY_GENERATE_MAXY && !_enemy_up) return true;
+	else if (enemy_posY <= ENEMY_GENERATE_MINY && _enemy_up) return false;
+	else return _enemy_up;
+}
+
+//float calculate_distance_player_to_enemy() {
+//
+//}
+
+void collision_enemy() {
+
+}
+
 void key_press(unsigned char key, int x, int y) {
 	if (!gameover_flag && !gameclear_flag) {
 		switch (key) {
@@ -130,26 +177,14 @@ void key_press(unsigned char key, int x, int y) {
 	}
 }
 
-void gameover_key_press(unsigned char key, int x, int y){
-	switch (key) {
-	case 'q':	//ゲーム終了
-		exit(0);
-		break;
-	default:
-		break;
-	}
-}
-
-
-void gameover() {
-	//文字列出力 gameover
-	//qで終了
-	gameover_flag = true;
-
-}
-
-void gameclear() {
-	gameclear_flag = true;
+//敵の描画
+void draw_enemy(float enemy_posX, float enemy_posY) {
+	glColor4f(1.0f, 0, 0, 0);
+	glBegin(GL_TRIANGLES);
+	glVertex2i(enemy_posX, enemy_posY);
+	glVertex2i(enemy_posX - ENEMY_SIZE / 2, enemy_posY + ENEMY_SIZE);
+	glVertex2i(enemy_posX + ENEMY_SIZE / 2, enemy_posY + ENEMY_SIZE);
+	glEnd();
 }
 
 void initialize() {
@@ -198,64 +233,66 @@ void display() {
 	player_posY = PLAYER_START_POSY + player_moveY_degree;
 
 	//敵1の移動処理
-	if (enemy1_posY >= ENEMY_GENERATE_MAXY && !enemy1_up) enemy1_up = true;
-	else if(enemy1_posY <= ENEMY_GENERATE_MINY && enemy1_up) enemy1_up = false;
-	if (enemy1_posX >= ENEMY_GENERATE_MAXX && !enemy1_goLeft) enemy1_goLeft = true;
-	else if (enemy1_posX <= ENEMY_GENERATE_MINX && enemy1_goLeft) enemy1_goLeft = false;
+	//if (enemy1_posY >= ENEMY_GENERATE_MAXY && !enemy1_up) enemy1_up = true;
+	//else if(enemy1_posY <= ENEMY_GENERATE_MINY && enemy1_up) enemy1_up = false;
+	//if (enemy1_posX >= ENEMY_GENERATE_MAXX && !enemy1_goLeft) enemy1_goLeft = true;
+	//else if (enemy1_posX <= ENEMY_GENERATE_MINX && enemy1_goLeft) enemy1_goLeft = false;
 
-	if (enemy1_up) enemy1_posY -= enemy1_speed;
-	else if (!enemy1_up) enemy1_posY += enemy1_speed;
+	//if (enemy1_up) enemy1_posY -= enemy1_speed;
+	//else if (!enemy1_up) enemy1_posY += enemy1_speed;
 
-	if (enemy1_goLeft) enemy1_posX -= enemy1_speed;
-	else if (!enemy1_goLeft) enemy1_posX += enemy1_speed;
+	//if (enemy1_goLeft) enemy1_posX -= enemy1_speed;
+	//else if (!enemy1_goLeft) enemy1_posX += enemy1_speed;
+
+	//enemy_move(enemy1_posX, enemy1_posY, enemy1_up, enemy1_goLeft, enemy1_speed);
+	enemy1_up = enemy_up_or_down(enemy1_posY, enemy1_up);
+	enemy1_goLeft = enemy_move_left_or_right(enemy1_posX,enemy1_goLeft);
+	enemy1_posX = enemy_move_side(enemy1_posX, enemy1_goLeft, enemy1_speed);
+	enemy1_posY = enemy_move_up(enemy1_posY, enemy1_up, enemy1_speed);
 
 	//敵2の移動処理
-	if (enemy2_posY >= ENEMY_GENERATE_MAXY && !enemy2_up) enemy2_up = true;
-	else if (enemy2_posY <= ENEMY_GENERATE_MINY && enemy2_up) enemy2_up = false;
-	if (enemy2_posX >= ENEMY_GENERATE_MAXX && !enemy2_goLeft) enemy2_goLeft = true;
-	else if (enemy2_posX <= ENEMY_GENERATE_MINX && enemy2_goLeft) enemy2_goLeft = false;
+	//if (enemy2_posY >= ENEMY_GENERATE_MAXY && !enemy2_up) enemy2_up = true;
+	//else if (enemy2_posY <= ENEMY_GENERATE_MINY && enemy2_up) enemy2_up = false;
+	//if (enemy2_posX >= ENEMY_GENERATE_MAXX && !enemy2_goLeft) enemy2_goLeft = true;
+	//else if (enemy2_posX <= ENEMY_GENERATE_MINX && enemy2_goLeft) enemy2_goLeft = false;
 
-	if (enemy2_up) enemy2_posY -= enemy2_speed;
-	else if (!enemy2_up) enemy2_posY += enemy2_speed;
+	//if (enemy2_up) enemy2_posY -= enemy2_speed;
+	//else if (!enemy2_up) enemy2_posY += enemy2_speed;
 
-	if (enemy2_goLeft) enemy2_posX -= enemy2_speed;
-	else if (!enemy2_goLeft) enemy2_posX += enemy2_speed;
+	//if (enemy2_goLeft) enemy2_posX -= enemy2_speed;
+	//else if (!enemy2_goLeft) enemy2_posX += enemy2_speed;
+
+	//enemy_move(enemy2_posX, enemy2_posY, enemy2_up, enemy2_goLeft, enemy2_speed);
+	enemy2_up = enemy_up_or_down(enemy2_posY, enemy2_up);
+	enemy2_goLeft = enemy_move_left_or_right(enemy2_posX, enemy2_goLeft);
+	enemy2_posX = enemy_move_side(enemy2_posX, enemy2_goLeft, enemy2_speed);
+	enemy2_posY = enemy_move_up(enemy2_posY, enemy2_up, enemy2_speed);
 
 	//敵3の移動処理
-	if (enemy3_posY >= ENEMY_GENERATE_MAXY && !enemy3_up) enemy3_up = true;
-	else if (enemy3_posY <= ENEMY_GENERATE_MINY && enemy3_up) enemy3_up = false;
-	if (enemy3_posX >= ENEMY_GENERATE_MAXX && !enemy3_goLeft) enemy3_goLeft = true;
-	else if (enemy3_posX <= ENEMY_GENERATE_MINX && enemy3_goLeft) enemy3_goLeft = false;
+	//if (enemy3_posY >= ENEMY_GENERATE_MAXY && !enemy3_up) enemy3_up = true;
+	//else if (enemy3_posY <= ENEMY_GENERATE_MINY && enemy3_up) enemy3_up = false;
+	//if (enemy3_posX >= ENEMY_GENERATE_MAXX && !enemy3_goLeft) enemy3_goLeft = true;
+	//else if (enemy3_posX <= ENEMY_GENERATE_MINX && enemy3_goLeft) enemy3_goLeft = false;
 
-	if (enemy3_up) enemy3_posY -= enemy3_speed;
-	else if (!enemy3_up) enemy3_posY += enemy3_speed;
+	//if (enemy3_up) enemy3_posY -= enemy3_speed;
+	//else if (!enemy3_up) enemy3_posY += enemy3_speed;
 
-	if (enemy3_goLeft) enemy3_posX -= enemy3_speed;
-	else if (!enemy3_goLeft) enemy3_posX += enemy3_speed;
+	//if (enemy3_goLeft) enemy3_posX -= enemy3_speed;
+	//else if (!enemy3_goLeft) enemy3_posX += enemy3_speed;
 
-	//敵1
-	glColor4f(1.0f,0,0,0);
-	glBegin(GL_TRIANGLES);
-	glVertex2i(enemy1_posX,enemy1_posY);
-	glVertex2i(enemy1_posX - ENEMY_SIZE / 2, enemy1_posY + ENEMY_SIZE);
-	glVertex2i(enemy1_posX + ENEMY_SIZE / 2, enemy1_posY + ENEMY_SIZE);
-	glEnd();
+	//enemy_move(enemy3_posX, enemy3_posY, enemy3_up, enemy3_goLeft, enemy3_speed);
+	enemy3_up = enemy_up_or_down(enemy3_posY, enemy3_up);
+	enemy3_goLeft = enemy_move_left_or_right(enemy3_posX, enemy3_goLeft);
+	enemy3_posX = enemy_move_side(enemy3_posX, enemy3_goLeft, enemy3_speed);
+	enemy3_posY = enemy_move_up(enemy3_posY, enemy3_up, enemy3_speed);
 
-	//敵2
-	glColor4f(1.0f, 0, 0, 0);
-	glBegin(GL_TRIANGLES);
-	glVertex2i(enemy2_posX, enemy2_posY);
-	glVertex2i(enemy2_posX - ENEMY_SIZE / 2, enemy2_posY + ENEMY_SIZE);
-	glVertex2i(enemy2_posX + ENEMY_SIZE / 2, enemy2_posY + ENEMY_SIZE);
-	glEnd();
+	//敵1の描画
+	draw_enemy(enemy1_posX,enemy1_posY);
+	//敵2の描画
+	draw_enemy(enemy2_posX, enemy2_posY);
+	//敵3の描画
+	draw_enemy(enemy3_posX, enemy3_posY);
 
-	//敵3
-	glColor4f(1.0f, 0, 0, 0);
-	glBegin(GL_TRIANGLES);
-	glVertex2i(enemy3_posX, enemy3_posY);
-	glVertex2i(enemy3_posX - ENEMY_SIZE / 2, enemy3_posY + ENEMY_SIZE);
-	glVertex2i(enemy3_posX + ENEMY_SIZE / 2, enemy3_posY + ENEMY_SIZE);
-	glEnd();
 
 	//ゴール描画
 	glColor4f(1.0f, 0.5f, 0.0f, 1.0f);	//オレンジ
@@ -324,8 +361,7 @@ void display() {
 
 int main(int argc, char** argv)
 {
-	//openglのコードを書く
-	//glutのコードも書く
+	//ゲーム開始前にコマンドプロンプトでゲームの難易度やプレイヤーの速度を変更できるようにしたい
 
 	initialize();
 	glutInit(&argc, argv);
