@@ -154,6 +154,28 @@ void draw_enemy(float enemy_posX, float enemy_posY) {
 	glEnd();
 }
 
+//ゴール描画
+void draw_goal() {
+	glColor4f(1.0f, 0.5f, 0.0f, 1.0f);	//オレンジ
+	glBegin(GL_QUADS);
+	glVertex2i(GOAL_POSX, GOAL_POSY);
+	glVertex2i(GOAL_POSX + GOAL_SIZEX, GOAL_POSY);
+	glVertex2i(GOAL_POSX + GOAL_SIZEX, GOAL_POSY + GOAL_SIZEY);
+	glVertex2i(GOAL_POSX, GOAL_POSY + GOAL_SIZEY);
+	glEnd();
+}
+
+//プレーヤー描画
+void draw_player(float _player_posX, float _player_posY) {
+	glColor4f(0.0f, 0.5f, 0.0f, 1.0f);	//緑
+	glBegin(GL_QUADS);
+	glVertex2i(_player_posX, _player_posY);
+	glVertex2i(_player_posX + PLAYER_SIZE, _player_posY);
+	glVertex2i(_player_posX + PLAYER_SIZE, _player_posY + PLAYER_SIZE);
+	glVertex2i(_player_posX, _player_posY + PLAYER_SIZE);
+	glEnd();
+}
+
 void initialize() {
 
 	//乱数の種生成
@@ -187,7 +209,9 @@ void display() {
 
 	//テキストUI表示
 	glColor4f(0.0f, 0.0f, 0.0f, 1.0f);	//黒
-	printString(0,20,"q:End",5);
+	printString(0, 20, "w,s,a,d:move", 12);
+	printString(0,40,"q:End",5);
+	printString(0,60,"GoTowardsTheOrangeGoal!",23);
 
 	//プレイヤーの位置取得
 	player_posX = PLAYER_START_POSX + player_moveX_degree;
@@ -222,25 +246,10 @@ void display() {
 	draw_enemy(enemy3_posX, enemy3_posY);
 
 	//ゴール描画
-	glColor4f(1.0f, 0.5f, 0.0f, 1.0f);	//オレンジ
-	glBegin(GL_QUADS);
-	glVertex2i(GOAL_POSX, GOAL_POSY);
-	glVertex2i(GOAL_POSX + GOAL_SIZEX, GOAL_POSY);
-	glVertex2i(GOAL_POSX + GOAL_SIZEX, GOAL_POSY + GOAL_SIZEY);
-	glVertex2i(GOAL_POSX, GOAL_POSY + GOAL_SIZEY);
-	glEnd();
-
-	//衝突判定用デバッグ
-	//cout << abs((player_posX + PLAYER_SIZE / 2) - enemy1_posX) << "X to " << abs((player_posY - PLAYER_SIZE / 2) - (enemy1_posY + ENEMY_SIZE / 2)) << "Y" << endl;
+	draw_goal();
 
 	//player(四角形)描画
-	glColor4f(0.0f, 0.5f, 0.0f, 1.0f);	//緑
-	glBegin(GL_QUADS);
-	glVertex2i(player_posX, player_posY);
-	glVertex2i(player_posX + PLAYER_SIZE, player_posY);
-	glVertex2i(player_posX + PLAYER_SIZE, player_posY + PLAYER_SIZE);
-	glVertex2i(player_posX, player_posY + PLAYER_SIZE);
-	glEnd();
+	draw_player(player_posX,player_posY);
 
 	//enemy1との衝突判定
 	//工夫したところ
@@ -292,7 +301,4 @@ int main(int argc, char** argv)
 
 	//ゲームループ
 	glutMainLoop();
-
-	if (gameover_flag) printf("Dont mind! You can do it!\n");
-	else if (gameclear_flag) printf("Congratulation!\n");
 }
